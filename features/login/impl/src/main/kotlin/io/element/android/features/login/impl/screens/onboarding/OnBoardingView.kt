@@ -1,11 +1,8 @@
 /*
- * Copyright (c) 2025 Element Creations Ltd.
- * Copyright 2023-2025 New Vector Ltd.
+ * Copyright (c) 2026 InstaX contributors.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
- * Please see LICENSE files in the repository root for full details.
+ * SPDX-License-Identifier: AGPL-3.0-only
  */
-
 package io.element.android.features.login.impl.screens.onboarding
 
 import androidx.compose.foundation.Image
@@ -17,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -37,8 +35,6 @@ import io.element.android.features.login.impl.R
 import io.element.android.features.login.impl.login.LoginModeEvent
 import io.element.android.features.login.impl.login.LoginModeView
 import io.element.android.libraries.architecture.AsyncData
-import io.element.android.libraries.designsystem.atomic.atoms.ElementLogoAtom
-import io.element.android.libraries.designsystem.atomic.atoms.ElementLogoAtomSize
 import io.element.android.libraries.designsystem.atomic.molecules.ButtonColumnMolecule
 import io.element.android.libraries.designsystem.atomic.pages.FlowStepPage
 import io.element.android.libraries.designsystem.atomic.pages.OnBoardingPage
@@ -159,7 +155,6 @@ private fun AddFirstAccountScaffold(
                     }
                 }
                 if (state.showBackButton) {
-                    // Add icon button to "navigate back"
                     IconButton(
                         onClick = onBackClick,
                         modifier = Modifier
@@ -180,9 +175,6 @@ private fun AddFirstAccountScaffold(
     )
 }
 
-/**
- * Ref: https://www.figma.com/design/kEAcfun9iSpszeUDvdKZ6b/ER-351--Multi-account-in-EX?node-id=147-34607
- */
 @Composable
 private fun AddOtherAccountScaffold(
     loginView: @Composable () -> Unit,
@@ -213,9 +205,10 @@ private fun OnBoardingContent(state: OnBoardingState) {
                 verticalBias = -0.4f
             )
         ) {
-            ElementLogoAtom(
-                size = ElementLogoAtomSize.Large,
-                modifier = Modifier.padding(top = ElementLogoAtomSize.Large.shadowRadius / 2)
+            Image(
+                painter = painterResource(R.drawable.instax_onboarding_logo),
+                contentDescription = null,
+                modifier = Modifier.size(104.dp),
             )
         }
         Box(
@@ -226,8 +219,7 @@ private fun OnBoardingContent(state: OnBoardingState) {
             )
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = CenterHorizontally,
             ) {
                 Text(
@@ -327,7 +319,6 @@ private fun OnBoardingButtons(
         }
         if (state.isAddingAccount.not()) {
             if (state.canReportBug) {
-                // Add a report problem text button. Use a Text since we need a special theme here.
                 Text(
                     modifier = Modifier
                         .clickable(onClick = onReportProblem)
