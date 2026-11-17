@@ -6,8 +6,8 @@
   ~ Please see LICENSE files in the repository root for full details.
   -->
 <resources>
-    <!-- Must be equal to DarkColorTokens.colorThemeBg -->
+    <!-- InstaX dark splash background -->
     <color name="splashscreen_bg_dark">#FF10111A</color>
-    <!-- Must be equal to LightColorTokens.colorThemeBg -->
+    <!-- InstaX light splash background -->
     <color name="splashscreen_bg_light">#FFFAF9FF</color>
 </resources>
