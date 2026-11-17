@@ -11,7 +11,7 @@ package config
 object BuildTimeConfig {
     const val APPLICATION_ID = "com.savan5685k.instax"
     const val APPLICATION_NAME = "InstaX"
-    val METADATA_HOST_REVERSED: String? = "com.savan5685k.instax"
+    val METADATA_HOST_REVERSED: String? = "instax.savan5685k.com"
     val OAUTH_CLIENT_URL_PATH: String? = "apps/android"
     val URL_WEBSITE: String? = null
     val URL_LOGO: String? = null
