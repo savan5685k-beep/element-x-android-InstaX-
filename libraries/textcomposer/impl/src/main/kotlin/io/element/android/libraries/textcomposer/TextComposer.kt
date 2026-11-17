@@ -653,8 +653,8 @@ private fun TextInputBox(
     trailingContent: (@Composable () -> Unit)? = null,
     textInput: @Composable () -> Unit,
 ) {
-    val bgColor = ElementTheme.colors.bgSubtleSecondary
-    val borderColor = ElementTheme.colors.borderDisabled
+    val bgColor = ElementTheme.colors.bgCanvasDefaultLevel1
+    val borderColor = ElementTheme.colors.borderAccentSubtle
     val roundedCorners = textInputRoundedCornerShape(composerMode = composerMode)
 
     Column(
