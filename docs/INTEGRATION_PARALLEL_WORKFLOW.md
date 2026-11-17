@@ -58,6 +58,16 @@ Before merging either branch into `develop`:
 - confirm signing secrets exist without revealing their values before attempting a signed release;
 - do not create a production release until the user explicitly requests it.
 
+
+## Latest CI findings (2026-11-17)
+
+- The debug-preview workflow successfully assembled both Gplay and F-Droid universal debug APKs and uploaded artifact `instax-debug-preview-c3760a54821f4fb8704306dc00dad113fb5943ee` (seven-day retention). This is a debug artifact, not a production release.
+- The dedicated compile/unit-test verification workflow passed app-variant compilation and app unit tests.
+- The broader code-quality workflow passed documentation checks, invalid-dependency checks, forbidden-pattern checks, ShellCheck, zizmor, Ktlint, Detekt, and Compose tests. Android lint identified one error: `app/src/main/res/drawable/transparent.xml` was unused. That unused resource has been removed on this non-UI hardening branch; the resulting push should rerun CI.
+- The same code-quality run reported two failures in the repository-wide `KonsistLicenseTest` (FOSS license-header assertion and duplicate Element copyright assertion). These checks inspect the whole repository, while this branch changes only workflow/documentation plus the unused drawable. The failure is not attributed to the debug-preview workflow; the exact offending source files still need to be isolated before any license rule or header is changed.
+- The repository Maestro emulator job reached its test runner but stopped because the required `MAESTRO_PASSWORD` environment secret was missing. No login or end-to-end UI result can be claimed from that run. Configure the intended test-account secret in repository Actions secrets, or explicitly keep authenticated Maestro flows disabled until a test account is provisioned. Never put credentials in source or logs.
+- OAuth/SSO, Matrix messaging, push delivery, calls, and physical-device visual review remain unverified.
+
 ## Current status
 
 The debug-preview pipeline has produced a successful artifact once. The workflow's local action reference was updated to GitHub's dedicated `$/.github/actions/setup-build` syntax after the security scanner's recommendation; the updated commit is undergoing CI. PR #2 has the `PR-Other` category label. This file records an audit and collaboration plan; it does not claim that OAuth, push delivery, production signing, or on-device UI behavior has been end-to-end tested.
