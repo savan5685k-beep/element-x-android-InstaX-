@@ -1,14 +1,13 @@
 /*
- * Copyright (c) 2025 Element Creations Ltd.
- * Copyright 2023-2025 New Vector Ltd.
+ * Copyright (c) 2026 InstaX contributors.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
- * Please see LICENSE files in the repository root for full details.
+ * SPDX-License-Identifier: AGPL-3.0-only
  */
 
 package io.element.android.features.preferences.impl.root
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -16,6 +15,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,20 +86,28 @@ fun PreferencesRootView(
     val snackbarHostState = rememberSnackbarHostState(snackbarMessage = state.snackbarMessage)
 
     Box(modifier = modifier) {
-        // Include pref from other modules
         PreferencePage(
             onBackClick = onBackClick,
             title = stringResource(id = CommonStrings.common_settings),
             snackbarHost = { SnackbarHost(snackbarHostState) }
         ) {
-            UserPreferences(
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = ElementTheme.colors.bgAccentSubtle.copy(alpha = 0.45f),
+                border = BorderStroke(1.dp, ElementTheme.colors.borderAccentSubtle.copy(alpha = 0.6f)),
                 modifier = Modifier
-                    .testTag(TestTags.settingsUserProfile)
-                    .clickable {
-                        onEditProfileClick(state.myUser)
-                    },
-                matrixUser = state.myUser,
-            )
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                UserPreferences(
+                    modifier = Modifier
+                        .testTag(TestTags.settingsUserProfile)
+                        .clickable {
+                            onEditProfileClick(state.myUser)
+                        },
+                    matrixUser = state.myUser,
+                )
+            }
             if (state.userStatusState != null) {
                 UserStatusSection(
                     userStatusState = state.userStatusState,
@@ -116,7 +125,6 @@ fun PreferencesRootView(
                 thickness = 8.dp,
                 color = ElementTheme.colors.bgSubtleSecondary,
             )
-            // Account settings section
             PreferencesAccountView(
                 state = state.preferencesAccountState,
                 onSecureBackupClick = onSecureBackupClick,
@@ -128,14 +136,12 @@ fun PreferencesRootView(
                 onSignOutClick = onSignOutClick,
                 onDeactivateClick = onDeactivateClick,
             )
-            // 'App settings' section
             AppSettingsSection(
                 state = state,
                 onOpenLockScreenSettings = onOpenLockScreenSettings,
                 onOpenMediaSettings = onOpenMediaSettings,
                 onOpenLocationSettings = onOpenLocationSettings,
             )
-            // General section
             GeneralSection(
                 state = state,
                 onOpenAbout = onOpenAbout,
@@ -143,7 +149,6 @@ fun PreferencesRootView(
                 onOpenDeveloperSettings = onOpenDeveloperSettings,
                 onOpenLabs = onOpenLabs,
             )
-            // Version
             Footer(
                 version = state.version,
                 onClick = if (!state.showDeveloperSettings) {
@@ -278,7 +283,6 @@ private fun ColumnScope.GeneralSection(
         leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Info())),
         onClick = onOpenAbout,
     )
-    // Put developer settings at the end, so nothing bad happens if the user clicks 8 times to enable the entry
     AnimatedVisibility(
         visible = state.showDeveloperSettings,
     ) {
