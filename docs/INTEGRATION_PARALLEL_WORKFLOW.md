@@ -36,6 +36,12 @@ The implementation contract is in [GEMINI_UI_IMPLEMENTATION_BRIEF.md](GEMINI_UI_
 4. **Optional services:** map, analytics, Sentry, and bug-report service values are null. These are not compile blockers, but related features may be unavailable or have reduced diagnostics.
 5. **APK testing:** the successful verification workflow deliberately produces no APK. A separate debug-package/install workflow or a local Android SDK build is needed for device visual review.
 
+## Debug preview workflow added
+
+A separate manual/PR/parallel-branch workflow is defined at `.github/workflows/instax-debug-preview.yml`. It assembles Gplay and F-Droid **debug** variants with the repository's debug signing configuration and uploads universal debug APKs as a seven-day GitHub Actions artifact. It does not read production signing secrets, publish a release, or change the compile-only verification workflow.
+
+The workflow triggers for pushes to `gemini/instax-ui` and `work/non-ui-hardening`, pull requests targeting `develop`, and manual dispatch. The workflow itself has been added to the working branch; it has not yet run, so artifact generation remains unverified.
+
 ## Correct device-preview model
 
 This is a native Jetpack Compose Android app, not a web frontend. Starting a localhost web server in Termux will not render the native Compose screens in a browser. Preview should use a debug APK installed on the Android device (or an Android emulator). Termux can be used for Git operations and, if the Android SDK/JDK/NDK environment is correctly available, local build commands; otherwise use GitHub Actions to build a debug APK and download/install that artifact. Never use a production-signed APK for routine UI preview.
