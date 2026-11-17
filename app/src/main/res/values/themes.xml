@@ -8,7 +8,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.InstaX.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splashscreen_bg_light</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/transparent</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_instax_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.InstaX</item>
         <item name="android:windowBackground">@color/splashscreen_bg_light</item>
         <item name="android:statusBarColor">@color/splashscreen_bg_light</item>
