@@ -69,7 +69,7 @@ import io.element.android.libraries.matrix.ui.model.InviteSender
 import io.element.android.libraries.ui.strings.CommonStrings
 import timber.log.Timber
 
-internal val minHeight = 84.dp
+internal val minHeight = 88.dp
 
 @Composable
 internal fun RoomSummaryRow(
@@ -194,7 +194,7 @@ private fun RoomSummaryScaffoldRow(
             .fillMaxWidth()
             .heightIn(min = minHeight)
             .then(clickModifier)
-            .padding(horizontal = 16.dp, vertical = 11.dp)
+            .padding(horizontal = 18.dp, vertical = 12.dp)
             .height(IntrinsicSize.Min),
     ) {
         Avatar(
@@ -209,7 +209,7 @@ private fun RoomSummaryScaffoldRow(
             },
             hideImage = hideAvatarImage,
         )
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(14.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),
             content = content,
