@@ -13,6 +13,10 @@ permissions: {}
 env:
   GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxMetaspaceSize=512m -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -XX:+UseG1GC -Dkotlin.daemon.jvm.options=-Xmx4g
   CI_GRADLE_ARG_PROPERTIES: --stacktrace -Dsonar.gradle.skipCompile=true --no-configuration-cache
+  INSTAX_RELEASE_KEYSTORE_BASE64: ${{ secrets.INSTAX_RELEASE_KEYSTORE_BASE64 }}
+  INSTAX_RELEASE_KEY_ALIAS: ${{ secrets.INSTAX_RELEASE_KEY_ALIAS }}
+  INSTAX_RELEASE_KEY_PASSWORD: ${{ secrets.INSTAX_RELEASE_KEY_PASSWORD }}
+  INSTAX_RELEASE_STORE_PASSWORD: ${{ secrets.INSTAX_RELEASE_STORE_PASSWORD }}
 
 jobs:
   build:
@@ -38,7 +42,7 @@ jobs:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
           persist-credentials: false
       - name: Setup build environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           free-disk-space: 'true'
           # Only this job writes the Gradle cache on develop, see the setup-build action
@@ -86,19 +90,33 @@ jobs:
           identifier: "GITHUB_COMMENT_QR_CODE"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Prepare production signing key
+        if: ${{ matrix.variant == 'release' && env.INSTAX_RELEASE_KEYSTORE_BASE64 != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$INSTAX_RELEASE_KEY_ALIAS"
+          test -n "$INSTAX_RELEASE_KEY_PASSWORD"
+          test -n "$INSTAX_RELEASE_STORE_PASSWORD"
+          printf '%s' "$INSTAX_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/instax-release.keystore"
+          chmod 600 "$RUNNER_TEMP/instax-release.keystore"
+          echo "INSTAX_RELEASE_STORE_FILE=$RUNNER_TEMP/instax-release.keystore" >> "$GITHUB_ENV"
       - name: Compile release sources
-        if: ${{ matrix.variant == 'release' }}
+        if: ${{ matrix.variant == 'release' && env.INSTAX_RELEASE_KEYSTORE_BASE64 != '' }}
         # Keep 2 separate invocations: when a requested task contains "bundle", the ABI splits and the universal APK are disabled
         # (see app/build.gradle.kts), and the universal APK is needed by the aapt dump below.
         run: |
           ./gradlew assembleGplayRelease -PallWarningsAsErrors=true $CI_GRADLE_ARG_PROPERTIES
           ./gradlew bundleGplayRelease -PallWarningsAsErrors=true $CI_GRADLE_ARG_PROPERTIES
       - name: Run aapt dump
-        if: ${{ matrix.variant == 'release' }}
+        if: ${{ matrix.variant == 'release' && env.INSTAX_RELEASE_KEYSTORE_BASE64 != '' }}
         run: ./tools/manifest/aaptDump.sh --skip-build /tmp/currentAaptDump.txt
       - name: Check manifest has not changed
-        if: ${{ matrix.variant == 'release' }}
+        if: ${{ matrix.variant == 'release' && env.INSTAX_RELEASE_KEYSTORE_BASE64 != '' }}
         run: diff /tmp/currentAaptDump.txt ./tools/manifest/gplay/release/aaptDump.txt
+      - name: Explain skipped production release build
+        if: ${{ matrix.variant == 'release' && env.INSTAX_RELEASE_KEYSTORE_BASE64 == '' }}
+        run: echo "Production release build skipped; configure INSTAX_RELEASE_KEYSTORE_BASE64 and the three signing credentials in repository Actions secrets."
       - name: Compile nightly sources
         if: ${{ matrix.variant == 'nightly' }}
         run: ./gradlew compileGplayNightlySources -PallWarningsAsErrors=true $CI_GRADLE_ARG_PROPERTIES
