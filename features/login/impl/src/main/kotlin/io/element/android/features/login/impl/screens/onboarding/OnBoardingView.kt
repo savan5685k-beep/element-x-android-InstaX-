@@ -5,16 +5,18 @@
  */
 package io.element.android.features.login.impl.screens.onboarding
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -53,9 +55,6 @@ import io.element.android.libraries.testtags.TestTags
 import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.strings.CommonStrings
 
-/**
- * Ref: https://www.figma.com/design/pDlJZGBsri47FNTXMnEdXB/Compound-Android-Templates?node-id=41-6503
- */
 @Composable
 fun OnBoardingView(
     state: OnBoardingState,
@@ -196,31 +195,46 @@ private fun AddOtherAccountScaffold(
 @Composable
 private fun OnBoardingContent(state: OnBoardingState) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp),
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = BiasAlignment(
                 horizontalBias = 0f,
-                verticalBias = -0.4f
+                verticalBias = -0.36f
             )
         ) {
-            Image(
-                painter = painterResource(R.drawable.instax_onboarding_logo),
-                contentDescription = null,
-                modifier = Modifier.size(104.dp),
-            )
+            Surface(
+                shape = RoundedCornerShape(32.dp),
+                color = ElementTheme.colors.bgAccentSubtle,
+                border = BorderStroke(1.dp, ElementTheme.colors.borderAccentSubtle),
+                shadowElevation = 2.dp,
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(22.dp)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.instax_onboarding_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(88.dp),
+                    )
+                }
+            }
         }
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = BiasAlignment(
                 horizontalBias = 0f,
-                verticalBias = 0.6f
+                verticalBias = 0.56f
             )
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Text(
                     text = stringResource(id = R.string.screen_onboarding_welcome_title),
@@ -228,12 +242,12 @@ private fun OnBoardingContent(state: OnBoardingState) {
                     style = ElementTheme.typography.fontHeadingLgBold,
                     textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(id = R.string.screen_onboarding_welcome_message, state.productionApplicationName),
-                    color = ElementTheme.colors.textPrimary,
+                    color = ElementTheme.colors.textSecondary,
                     style = ElementTheme.typography.fontBodyLgRegular,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp),
                 )
             }
         }
