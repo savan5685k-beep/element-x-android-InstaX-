@@ -97,6 +97,16 @@ android {
             storeFile = file("./signature/debug.keystore")
             storePassword = "android"
         }
+        // Production signing material is supplied only through CI secrets or local environment.
+        // Never fall back to the public debug or nightly keystore for a production release.
+        register("production") {
+            keyAlias = environmentOrGradleValue("INSTAX_RELEASE_KEY_ALIAS", "signing.instax.release.keyAlias")
+            keyPassword = environmentOrGradleValue("INSTAX_RELEASE_KEY_PASSWORD", "signing.instax.release.keyPassword")
+            storeFile = environmentOrGradleValue("INSTAX_RELEASE_STORE_FILE", "signing.instax.release.storeFile")
+                ?.takeIf { it.isNotBlank() }
+                ?.let(::file)
+            storePassword = environmentOrGradleValue("INSTAX_RELEASE_STORE_PASSWORD", "signing.instax.release.storePassword")
+        }
         register("nightly") {
             keyAlias = environmentOrGradleValue("ELEMENT_ANDROID_NIGHTLY_KEYID", "signing.element.nightly.keyId")
             keyPassword = environmentOrGradleValue("ELEMENT_ANDROID_NIGHTLY_KEYPASSWORD", "signing.element.nightly.keyPassword")
@@ -133,7 +143,7 @@ android {
                 "login_redirect_scheme",
                 oAuthRedirectSchemeBase,
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("production")
 
             optimization {
                 enable = true
