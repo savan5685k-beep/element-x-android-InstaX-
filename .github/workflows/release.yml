@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
+    tags: [ 'instax-v*' ]
 
 permissions: {}
 
@@ -11,6 +12,10 @@ permissions: {}
 env:
   GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx8g -XX:MaxMetaspaceSize=512m -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -XX:+UseG1GC -Dkotlin.daemon.jvm.options=-Xmx4g
   CI_GRADLE_ARG_PROPERTIES: --stacktrace --no-daemon -Dsonar.gradle.skipCompile=true --no-configuration-cache
+  INSTAX_RELEASE_KEYSTORE_BASE64: ${{ secrets.INSTAX_RELEASE_KEYSTORE_BASE64 }}
+  INSTAX_RELEASE_KEY_ALIAS: ${{ secrets.INSTAX_RELEASE_KEY_ALIAS }}
+  INSTAX_RELEASE_KEY_PASSWORD: ${{ secrets.INSTAX_RELEASE_KEY_PASSWORD }}
+  INSTAX_RELEASE_STORE_PASSWORD: ${{ secrets.INSTAX_RELEASE_STORE_PASSWORD }}
 
 jobs:
   gplay:
@@ -27,9 +32,20 @@ jobs:
       - name: Check Matrix Rust SDK is not a nightly version
         run: ./tools/release/check_no_nightly_sdk.sh
       - name: Setup build environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           free-disk-space: 'true'
+      - name: Prepare production signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$INSTAX_RELEASE_KEYSTORE_BASE64" || { echo "Missing INSTAX_RELEASE_KEYSTORE_BASE64 Actions secret"; exit 1; }
+          test -n "$INSTAX_RELEASE_KEY_ALIAS"
+          test -n "$INSTAX_RELEASE_KEY_PASSWORD"
+          test -n "$INSTAX_RELEASE_STORE_PASSWORD"
+          printf '%s' "$INSTAX_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/instax-release.keystore"
+          chmod 600 "$RUNNER_TEMP/instax-release.keystore"
+          echo "INSTAX_RELEASE_STORE_FILE=$RUNNER_TEMP/instax-release.keystore" >> "$GITHUB_ENV"
       - name: Create app bundle
         env:
           ELEMENT_ANDROID_MAPTILER_API_KEY: ${{ secrets.MAPTILER_KEY }}
@@ -45,7 +61,7 @@ jobs:
       - name: Upload bundle as artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: elementx-app-gplay-bundle-unsigned
+          name: instax-app-gplay-bundle-signed
           path: |
             app/build/outputs/bundle/gplayRelease/app-gplay-release.aab
 
@@ -66,6 +82,17 @@ jobs:
         uses: $/.github/actions/setup-build
         with:
           free-disk-space: 'true'
+      - name: Prepare production signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$INSTAX_RELEASE_KEYSTORE_BASE64" || { echo "Missing INSTAX_RELEASE_KEYSTORE_BASE64 Actions secret"; exit 1; }
+          test -n "$INSTAX_RELEASE_KEY_ALIAS"
+          test -n "$INSTAX_RELEASE_KEY_PASSWORD"
+          test -n "$INSTAX_RELEASE_STORE_PASSWORD"
+          printf '%s' "$INSTAX_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/instax-release.keystore"
+          chmod 600 "$RUNNER_TEMP/instax-release.keystore"
+          echo "INSTAX_RELEASE_STORE_FILE=$RUNNER_TEMP/instax-release.keystore" >> "$GITHUB_ENV"
       - name: Create APKs
         env:
           ELEMENT_ANDROID_MAPTILER_API_KEY: ${{ secrets.MAPTILER_KEY }}
@@ -75,6 +102,6 @@ jobs:
       - name: Upload apks as artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: elementx-app-fdroid-apks-unsigned
+          name: instax-app-fdroid-apks-signed
           path: |
             app/build/outputs/apk/fdroid/release/*.apk
