@@ -35,14 +35,10 @@ jobs:
           free-disk-space: 'true'
           gradle-cache-read-only: ${{ github.ref != 'refs/heads/develop' }}
 
-      # These tasks compile the app variants and run JVM tests without packaging APK/AAB files.
-      # The production APK is intentionally reserved for the final release stage.
+      # Compile-only tasks and JVM tests; do not package APK/AAB files before the final release stage.
       - name: Compile app variants
         run: |
           ./gradlew :app:compileGplayDebugKotlin :app:compileFdroidDebugKotlin :app:compileGplayReleaseKotlin -PallWarningsAsErrors=true $CI_GRADLE_ARG_PROPERTIES
 
       - name: Run app unit tests
         run: ./gradlew :app:testGplayDebugUnitTest -PallWarningsAsErrors=true $CI_GRADLE_ARG_PROPERTIES
-
-      - name: Verify release manifest snapshot
-        run: ./tools/manifest/aaptDump.sh --help
