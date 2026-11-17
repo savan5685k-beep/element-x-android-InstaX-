@@ -40,7 +40,7 @@ The implementation contract is in [GEMINI_UI_IMPLEMENTATION_BRIEF.md](GEMINI_UI_
 
 A separate manual/PR/parallel-branch workflow is defined at `.github/workflows/instax-debug-preview.yml`. It assembles Gplay and F-Droid **debug** variants with the repository's debug signing configuration and uploads universal debug APKs as a seven-day GitHub Actions artifact. It does not read production signing secrets, publish a release, or change the compile-only verification workflow.
 
-The workflow triggers for pushes to `gemini/instax-ui` and `work/non-ui-hardening`, pull requests targeting `develop`, and manual dispatch. The workflow itself has been added to the working branch; it has not yet run, so artifact generation remains unverified.
+The workflow triggers for pushes to `gemini/instax-ui` and `work/non-ui-hardening`, pull requests targeting `develop`, and manual dispatch. Its first observed run on PR #2 completed successfully: both Gplay and F-Droid debug APK assembly and artifact upload passed. The uploaded artifact is retained for seven days. A subsequent run is validating the hardened workflow reference.
 
 ## Correct device-preview model
 
@@ -60,4 +60,4 @@ Before merging either branch into `develop`:
 
 ## Current status
 
-This file records an audit and collaboration plan; it does not claim that OAuth, push delivery, production signing, or on-device UI behavior has been end-to-end tested.
+The debug-preview pipeline has produced a successful artifact once. The workflow's local action reference was updated to GitHub's dedicated `$/.github/actions/setup-build` syntax after the security scanner's recommendation; the updated commit is undergoing CI. PR #2 has the `PR-Other` category label. This file records an audit and collaboration plan; it does not claim that OAuth, push delivery, production signing, or on-device UI behavior has been end-to-end tested.
