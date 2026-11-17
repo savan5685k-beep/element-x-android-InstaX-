@@ -82,8 +82,8 @@ fun ElementThemeApp(
         ElementTheme(
             theme = theme,
             content = content,
-            compoundLight = compoundLight,
-            compoundDark = compoundDark,
+            compoundLight = compoundLight.withInstaXBrand(),
+            compoundDark = compoundDark.withInstaXBrand(),
         )
     }
 }
