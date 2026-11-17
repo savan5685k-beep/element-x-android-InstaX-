@@ -1,9 +1,7 @@
 /*
- * Copyright (c) 2025 Element Creations Ltd.
- * Copyright 2022-2025 New Vector Ltd.
+ * Copyright (c) 2026 InstaX contributors.
  *
- * SPDX-License-Identifier: AGPL-3.0-only OR LicenseRef-Element-Commercial.
- * Please see LICENSE files in the repository root for full details.
+ * SPDX-License-Identifier: AGPL-3.0-only
  */
 
 package io.element.android.features.messages.impl.timeline.components
@@ -54,7 +52,7 @@ import io.element.android.libraries.testtags.testTag
 import io.element.android.libraries.ui.utils.a11y.isTalkbackActive
 import io.element.android.libraries.ui.utils.graphics.drawInLayer
 
-private val BUBBLE_RADIUS = 12.dp
+private val BUBBLE_RADIUS = 16.dp
 private val avatarRadius = AvatarSize.TimelineSender.dp / 2
 
 private val MIN_BUBBLE_WIDTH = 80.dp
@@ -85,36 +83,32 @@ fun MessageEventBubble(
     }
 
     val cutTopStart = state.cutTopStart
-    // Ignore state.isHighlighted for now, we need a design decision on it.
     val backgroundBubbleColor by rememberUpdatedState(customBackgroundColor ?: MessageEventBubbleDefaults.backgroundBubbleColor(state.isMine))
+    val defaultInstaXBorderColor = if (state.isMine) {
+        ElementTheme.colors.borderAccentPrimary.copy(alpha = 0.25f)
+    } else {
+        ElementTheme.colors.borderAccentSubtle.copy(alpha = 0.35f)
+    }
+    val resolvedBorderColor = borderColor ?: defaultInstaXBorderColor
     val radiusPx = (avatarRadius + SENDER_AVATAR_BORDER_WIDTH).toPx()
     val yOffsetPx = -(NEGATIVE_MARGIN_FOR_BUBBLE + avatarRadius).toPx()
 
-    val updatedBorderColor by rememberUpdatedState(borderColor)
+    val updatedBorderColor by rememberUpdatedState(resolvedBorderColor)
     BoxWithConstraints(
         modifier = modifier
             .drawWithCache {
-                // Calculate the outline of the background and cache it
                 val outline = bubbleShape.createOutline(size, layoutDirection, this)
 
                 onDrawWithContent {
-                    // Draw the contents in a layer to be able to clip them with the same outline
-                    // For some reason, doing this clipping outside a layer messes up with the touch events
                     drawInLayer(
                         composingStrategy = CompositingStrategy.Offscreen,
                         outline = outline,
                         clip = true,
                     ) {
-                        // Draw the background first, so that it's behind the content
                         drawRect(backgroundBubbleColor)
-
-                        // Then draw the content on top of it
                         drawContent()
+                        drawOutline(outline, updatedBorderColor, style = Stroke(width = 1.dp.toPx()))
 
-                        // Draw border color, if any
-                        updatedBorderColor?.let { drawOutline(outline, it, style = Stroke(width = 1.dp.toPx())) }
-
-                        // And then clip the top start corner if needed to make room for the avatar
                         if (cutTopStart) {
                             drawCircle(
                                 color = Color.Black,
@@ -129,8 +123,6 @@ fun MessageEventBubble(
                     }
                 }
             },
-        // Need to set the contentAlignment again (it's already set in TimelineItemEventRow), for the case
-        // when content width is low.
         contentAlignment = if (state.isMine) Alignment.CenterEnd else Alignment.CenterStart
     ) {
         Box(
@@ -151,21 +143,22 @@ fun MessageEventBubble(
 object MessageEventBubbleDefaults {
     fun shape(cutTopStart: Boolean, groupPosition: TimelineItemGroupPosition, isMine: Boolean): Shape {
         val topLeftCorner = if (cutTopStart) 0.dp else BUBBLE_RADIUS
+        val groupedCorner = 4.dp
         return when (groupPosition) {
             TimelineItemGroupPosition.First -> if (isMine) {
-                RoundedCornerShape(BUBBLE_RADIUS, BUBBLE_RADIUS, 0.dp, BUBBLE_RADIUS)
+                RoundedCornerShape(BUBBLE_RADIUS, BUBBLE_RADIUS, groupedCorner, BUBBLE_RADIUS)
             } else {
-                RoundedCornerShape(topLeftCorner, BUBBLE_RADIUS, BUBBLE_RADIUS, 0.dp)
+                RoundedCornerShape(topLeftCorner, BUBBLE_RADIUS, BUBBLE_RADIUS, groupedCorner)
             }
             TimelineItemGroupPosition.Middle -> if (isMine) {
-                RoundedCornerShape(BUBBLE_RADIUS, 0.dp, 0.dp, BUBBLE_RADIUS)
+                RoundedCornerShape(BUBBLE_RADIUS, groupedCorner, groupedCorner, BUBBLE_RADIUS)
             } else {
-                RoundedCornerShape(0.dp, BUBBLE_RADIUS, BUBBLE_RADIUS, 0.dp)
+                RoundedCornerShape(groupedCorner, BUBBLE_RADIUS, BUBBLE_RADIUS, groupedCorner)
             }
             TimelineItemGroupPosition.Last -> if (isMine) {
-                RoundedCornerShape(BUBBLE_RADIUS, 0.dp, BUBBLE_RADIUS, BUBBLE_RADIUS)
+                RoundedCornerShape(BUBBLE_RADIUS, groupedCorner, BUBBLE_RADIUS, BUBBLE_RADIUS)
             } else {
-                RoundedCornerShape(0.dp, BUBBLE_RADIUS, BUBBLE_RADIUS, BUBBLE_RADIUS)
+                RoundedCornerShape(groupedCorner, BUBBLE_RADIUS, BUBBLE_RADIUS, BUBBLE_RADIUS)
             }
             TimelineItemGroupPosition.None ->
                 RoundedCornerShape(
@@ -186,14 +179,12 @@ object MessageEventBubbleDefaults {
         }
     }
 
-    // Design says: The maximum width of a bubble is still 3/4 of the screen width. But try with 78% now.
     const val BUBBLE_WIDTH_RATIO = 0.78f
 }
 
 @PreviewsDayNight
 @Composable
 internal fun MessageEventBubblePreview(@PreviewParameter(BubbleStatePreviewParam::class) state: BubbleState) = ElementPreview {
-    // Due to position offset, surround with a Box
     Box(
         modifier = Modifier
             .size(width = 240.dp, height = 64.dp)
@@ -206,7 +197,6 @@ internal fun MessageEventBubblePreview(@PreviewParameter(BubbleStatePreviewParam
             onClick = {},
             onLongClick = {},
         ) {
-            // Render the state as a text to better understand the previews
             Box(
                 modifier = Modifier
                     .size(width = 120.dp, height = 32.dp)
