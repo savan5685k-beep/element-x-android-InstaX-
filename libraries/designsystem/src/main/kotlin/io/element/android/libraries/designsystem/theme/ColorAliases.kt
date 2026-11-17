@@ -38,12 +38,12 @@ val SemanticColors.placeholderBackground
 // This color is not present in Semantic color, so put hard-coded value for now
 @OptIn(CoreColorToken::class)
 val SemanticColors.messageFromMeBackground
-    get() = if (isLight) LightColorTokens.colorGray400 else DarkColorTokens.colorGray500
+    get() = if (isLight) Color(0xFFECE6FF) else Color(0xFF3A3155)
 
 // This color is not present in Semantic color, so put hard-coded value for now
 @OptIn(CoreColorToken::class)
 val SemanticColors.messageFromOtherBackground
-    get() = if (isLight) LightColorTokens.colorGray300 else DarkColorTokens.colorGray400
+    get() = if (isLight) Color(0xFFF1EFF7) else Color(0xFF252432)
 
 // This color is not present in Semantic color, so put hard-coded value for now
 @OptIn(CoreColorToken::class)
