@@ -59,6 +59,9 @@ jobs:
     timeout-minutes: 90
     needs: [ build-apk ]
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      MAESTRO_PASSWORD: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_PASSWORD }}
+      MAESTRO_RECOVERY_KEY: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_RECOVERY_KEY }}
     # Allow only one to run at a time, since they use the same environment.
     # Otherwise, tests running in parallel can break each other.
     # queue: max lets several runs wait their turn instead of the default, where a
