@@ -9,6 +9,7 @@
 package io.element.android.features.roomdetails.impl
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -420,8 +421,9 @@ private fun MainActionsSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
                 .padding(horizontal = 8.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             state.roomNotificationSettings?.let { roomNotificationSettings ->
                 if (roomNotificationSettings.mode == RoomNotificationMode.MUTE) {
