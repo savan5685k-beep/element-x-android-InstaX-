@@ -50,7 +50,7 @@ internal fun VoiceMessageRecording(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = ElementTheme.colors.bgSubtleSecondary,
+                color = ElementTheme.colors.bgAccentSubtle,
                 shape = MaterialTheme.shapes.medium,
             )
             .padding(start = 12.dp, end = 20.dp, top = 8.dp, bottom = 8.dp)
