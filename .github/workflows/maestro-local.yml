@@ -89,12 +89,12 @@ jobs:
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         continue-on-error: true
         env:
-          MAESTRO_USERNAME: maestroelement
+          MAESTRO_USERNAME: instaxmaestro5685
           MAESTRO_PASSWORD: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_PASSWORD }}
           MAESTRO_RECOVERY_KEY: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_RECOVERY_KEY }}
           MAESTRO_ROOM_NAME: MyRoom
-          MAESTRO_INVITEE1_MXID: "@maestroelement2:matrix.org"
-          MAESTRO_INVITEE2_MXID: "@maestroelement3:matrix.org"
+          MAESTRO_INVITEE1_MXID: "@instaxmaestro56852:matrix.org"
+          MAESTRO_INVITEE2_MXID: "@instaxmaestro56853:matrix.org"
           MAESTRO_APP_ID: io.element.android.x.debug
         with:
           api-level: ${{ env.API_LEVEL }}
@@ -118,7 +118,7 @@ jobs:
           MAS_PASSWORD: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_PASSWORD }}
         run: |
           pip install requests
-          python3 ./tools/mas/delete_all_sessions.py --homeserver matrix.org --username maestroelement
+          python3 ./tools/mas/delete_all_sessions.py --homeserver matrix.org --username instaxmaestro5685
       - name: Upload test results
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
