@@ -17,6 +17,8 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.v2.runAndroidComposeUiTest
 import io.element.android.features.roomdetails.impl.members.aRoomMember
@@ -174,7 +176,9 @@ class RoomDetailsViewTest : RobolectricTest() {
                 ),
                 onSecurityAndPrivacyClick = callback,
             )
-            clickOn(R.string.screen_room_details_security_and_privacy_title)
+            onNodeWithText(activity!!.getString(R.string.screen_room_details_security_and_privacy_title))
+                .performScrollTo()
+                .performClick()
         }
     }
 
