@@ -15,6 +15,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -265,6 +267,12 @@ private fun SpaceViewContent(
                 exit = fadeOut() + shrinkVertically()
             ) {
                 Column {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = ElementTheme.colors.bgAccentSubtle.copy(alpha = 0.35f),
+                        border = BorderStroke(1.dp, ElementTheme.colors.borderAccentSubtle.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    ) {
                     SpaceHeaderView(
                         avatarData = spaceInfo.getAvatarData(AvatarSize.SpaceHeader),
                         alias = spaceInfo.canonicalAlias,
@@ -276,6 +284,7 @@ private fun SpaceViewContent(
                         numberOfMembers = spaceInfo.joinedMembersCount.toInt(),
                         onTopicClick = onTopicClick
                     )
+                    }
                     HorizontalDivider()
                 }
             }
