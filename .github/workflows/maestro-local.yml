@@ -101,7 +101,7 @@ jobs:
           arch: ${{ env.ARCH }}
           profile: ${{ env.DEVICE }}
           target: ${{ env.TARGET }}
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           disk-size: 3G
           script: |
@@ -117,8 +117,12 @@ jobs:
         env:
           MAS_PASSWORD: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_PASSWORD }}
         run: |
-          pip install requests
-          python3 ./tools/mas/delete_all_sessions.py --homeserver matrix.org --username instaxmaestro5685
+          if [ -z "$MAS_PASSWORD" ]; then
+            echo "MATRIX_MAESTRO_ACCOUNT_PASSWORD is not configured; skipping session cleanup."
+          else
+            pip install requests
+            python3 ./tools/mas/delete_all_sessions.py --homeserver matrix.org --username instaxmaestro5685
+          fi
       - name: Upload test results
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
