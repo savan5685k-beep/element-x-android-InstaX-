@@ -116,7 +116,7 @@ fun EditUserProfileView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp, horizontal = 16.dp),
+                        .padding(vertical = 28.dp, horizontal = 20.dp),
                 ) {
                     val avatarPickerState = remember(state.userAvatarUrl) {
                         val size = AvatarSize.EditProfileDetails
