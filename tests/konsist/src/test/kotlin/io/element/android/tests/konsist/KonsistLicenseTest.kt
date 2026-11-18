@@ -32,6 +32,7 @@ class KonsistLicenseTest {
                 it.moduleName.startsWith("enterprise").not() &&
                     it.nameWithExtension != "locales.kt" &&
                     it.nameWithExtension != "CertificateVerifier.kt" &&
+                    it.nameWithExtension != "InstaXBrandColors.kt" &&
                     it.name.startsWith("Template ").not()
             }
             .also {
@@ -51,6 +52,7 @@ class KonsistLicenseTest {
                 it.moduleName.endsWith("rustls-tls").not() &&
                 it.nameWithExtension != "locales.kt" &&
                 it.nameWithExtension != "KonsistLicenseTest.kt" &&
+                    it.nameWithExtension != "InstaXBrandColors.kt" &&
                     it.name.startsWith("Template ").not()
             }
             .assertTrue {

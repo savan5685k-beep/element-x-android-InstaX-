@@ -61,7 +61,7 @@ internal fun VoiceMessagePreview(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = ElementTheme.colors.bgSubtleSecondary,
+                color = ElementTheme.colors.bgAccentSubtle,
                 shape = MaterialTheme.shapes.medium,
             )
             .padding(start = 8.dp, end = 20.dp, top = 6.dp, bottom = 6.dp)
@@ -115,7 +115,7 @@ private fun PlayerButton(
             .size(30.dp),
         enabled = enabled,
         colors = IconButtonDefaults.iconButtonColors(
-            contentColor = ElementTheme.colors.iconSecondary,
+            contentColor = ElementTheme.colors.iconAccentPrimary,
             disabledContentColor = ElementTheme.colors.iconDisabled,
         ),
     ) {

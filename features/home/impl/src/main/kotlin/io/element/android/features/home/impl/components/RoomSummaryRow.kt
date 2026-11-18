@@ -8,6 +8,7 @@
 
 package io.element.android.features.home.impl.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -24,11 +25,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -91,6 +94,7 @@ internal fun RoomSummaryRow(
                 RoomSummaryScaffoldRow(
                     room = room,
                     hideAvatarImage = hideInviteAvatars,
+                    isElevatedUnread = !isInviteSeen,
                     onClick = onClick,
                     onLongClick = {
                         Timber.d("Long click on invite room")
@@ -120,6 +124,7 @@ internal fun RoomSummaryRow(
             RoomSummaryDisplayType.ROOM -> {
                 RoomSummaryScaffoldRow(
                     room = room,
+                    isElevatedUnread = room.hasNewContent || room.isHighlighted,
                     onClick = onClick,
                     onLongClick = {
                         eventSink(RoomListEvent.ShowContextMenu(room))
@@ -178,8 +183,10 @@ private fun RoomSummaryScaffoldRow(
     onLongClick: (RoomListRoomSummary) -> Unit,
     modifier: Modifier = Modifier,
     hideAvatarImage: Boolean = false,
+    isElevatedUnread: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val rowShape = RoundedCornerShape(16.dp)
     val clickModifier = Modifier
         .combinedClickable(
             onClick = { onClick(room) },
@@ -189,12 +196,20 @@ private fun RoomSummaryScaffoldRow(
             interactionSource = remember { MutableInteractionSource() }
         )
         .onKeyboardContextMenuAction { onLongClick(room) }
+    val containerModifier = if (isElevatedUnread) {
+        modifier
+            .padding(horizontal = 8.dp, vertical = 2.dp)
+            .clip(rowShape)
+            .background(ElementTheme.colors.bgAccentSubtle.copy(alpha = 0.28f))
+    } else {
+        modifier
+    }
     Row(
-        modifier = modifier
+        modifier = containerModifier
             .fillMaxWidth()
             .heightIn(min = minHeight)
             .then(clickModifier)
-            .padding(horizontal = 18.dp, vertical = 12.dp)
+            .padding(horizontal = if (isElevatedUnread) 10.dp else 18.dp, vertical = 12.dp)
             .height(IntrinsicSize.Min),
     ) {
         Avatar(
@@ -238,7 +253,6 @@ private fun NameAndTimestampRow(
             nameColor = ElementTheme.colors.roomListRoomName,
             nameFontStyle = FontStyle.Italic.takeIf { name == null },
         )
-        // Timestamp
         Text(
             text = timestamp ?: "",
             style = ElementTheme.typography.fontBodySmMedium,
@@ -301,7 +315,6 @@ private fun MessagePreviewAndIndicatorRow(
                         .padding(top = 2.dp)
                         .size(16.dp),
                     imageVector = CompoundIcons.ErrorSolid(),
-                    // The last message contains the error.
                     contentDescription = null,
                     tint = ElementTheme.colors.iconCriticalPrimary,
                 )
@@ -343,10 +356,8 @@ private fun MessagePreviewAndIndicatorRow(
             }
         }
         Spacer(modifier = Modifier.width(16.dp))
-        // Call and unread
         Row(
             modifier = Modifier
-                // Used to force this line to be read aloud earlier than the latest event when using Talkback
                 .zIndex(-1f),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -376,23 +387,14 @@ private fun MessagePreviewAndIndicatorRow(
     }
 }
 
-/**
- * Computes the value to pass to [UnreadIndicatorAtom] as `count`.
- * - `null`: nothing is displayed.
- * - `0`: dot indicator without a count.
- * - `> 0`: the number to display.
- */
 internal fun RoomListRoomSummary.unreadIndicatorCount(
     showUnreadCount: Boolean,
     showAllActivity: Boolean,
 ): Long? {
     val isMuted = userDefinedNotificationMode == RoomNotificationMode.MUTE
     return when {
-        // Show only unread notifications when the room is not muted and there are unread notifications
         !isMuted && numberOfUnreadNotifications > 0 -> if (showUnreadCount) numberOfUnreadNotifications else 0
-        // Otherwise, show a dot for unread messages when showAllActivity is true and there are unread messages
         showAllActivity -> if (numberOfUnreadMessages > 0) 0 else null
-        // Or don't display anything
         else -> null
     }
 }
@@ -464,7 +466,6 @@ internal fun RoomSummaryRowPreview(@PreviewParameter(RoomListRoomSummaryPreviewP
     RoomSummaryRow(
         room = data,
         hideInviteAvatars = false,
-        // Set isInviteSeen to true for the preview when the room has name "Bob"
         isInviteSeen = data.name == "Bob",
         onClick = {},
         eventSink = {},

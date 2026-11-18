@@ -16,6 +16,7 @@ import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.viewinterop.AndroidView
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.features.call.impl.R
 import io.element.android.features.call.impl.pip.PictureInPictureEvent
 import io.element.android.features.call.impl.pip.PictureInPictureState
@@ -99,7 +101,10 @@ internal fun CallScreenView(
         }
 
         CallWebView(
-            modifier = modifier.consumeWindowInsets(WindowInsets.systemBars).fillMaxSize(),
+            modifier = modifier
+                .background(ElementTheme.colors.bgCanvasDefault)
+                .consumeWindowInsets(WindowInsets.systemBars)
+                .fillMaxSize(),
             url = state.urlState,
             userAgent = state.userAgent,
             onPermissionsRequest = { request ->
@@ -141,7 +146,6 @@ internal fun CallScreenView(
             },
             onDestroyWebView = {
                 callWebView = null
-                // Reset audio mode
                 webViewAudioManager?.onCallStopped()
             }
         )

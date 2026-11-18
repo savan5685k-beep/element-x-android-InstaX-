@@ -454,11 +454,11 @@ private fun LazyListScope.searchHistory(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(ElementTheme.colors.bgSubtleSecondary)
+                            .background(ElementTheme.colors.bgAccentSubtle)
                             .padding(6.dp),
                         imageVector = CompoundIcons.History(),
                         contentDescription = null,
-                        tint = ElementTheme.colors.iconPrimary,
+                        tint = ElementTheme.colors.iconAccentPrimary,
                     )
 
                     Text(

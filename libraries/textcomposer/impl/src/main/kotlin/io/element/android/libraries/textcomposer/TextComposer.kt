@@ -511,7 +511,7 @@ private fun StandardLayout(
                                 modifier = Modifier
                                     .clip(CircleShape)
                                     .size(30.dp)
-                                    .background(ElementTheme.colors.iconPrimary)
+                                    .background(ElementTheme.colors.bgActionPrimaryRest)
                                     .padding(3.dp),
                                 imageVector = CompoundIcons.Plus(),
                                 contentDescription = stringResource(R.string.rich_text_editor_a11y_add_attachment),
@@ -660,7 +660,7 @@ private fun TextInputBox(
     Column(
         modifier = Modifier
             .clip(roundedCorners)
-            .border(0.5.dp, borderColor, roundedCorners)
+            .border(1.dp, borderColor, roundedCorners)
             .background(color = bgColor)
             .requiredHeightIn(min = 42.dp)
             .fillMaxSize()

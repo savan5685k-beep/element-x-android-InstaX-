@@ -9,14 +9,19 @@
 package io.element.android.features.messages.impl.messagecomposer
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +32,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import io.element.android.compound.theme.ElementTheme
 import io.element.android.compound.tokens.generated.CompoundIcons
 import io.element.android.features.messages.impl.R
 import io.element.android.libraries.androidutils.ui.hideKeyboard
@@ -56,14 +63,12 @@ internal fun AttachmentsBottomSheet(
 
     LaunchedEffect(state.showAttachmentSourcePicker) {
         isVisible = if (state.showAttachmentSourcePicker) {
-            // We need to use this instead of `LocalFocusManager.clearFocus()` to hide the keyboard when focus is on an Android View
             localView.hideKeyboard()
             true
         } else {
             false
         }
     }
-    // Send 'DismissAttachmentMenu' event when the bottomsheet was just hidden
     LaunchedEffect(isVisible) {
         if (!isVisible) {
             state.eventSink(MessageComposerEvent.DismissAttachmentMenu)
@@ -98,55 +103,65 @@ private fun AttachmentSourcePickerMenu(
     enableTextFormatting: Boolean,
 ) {
     Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .navigationBarsPadding()
             .imePadding()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        ListItem(
-            modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.PhotoFromCamera) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.TakePhoto())),
-            content = { Text(stringResource(R.string.screen_room_attachment_source_camera_photo)) },
-        )
-        ListItem(
-            modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.VideoFromCamera) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.VideoCall())),
-            content = { Text(stringResource(R.string.screen_room_attachment_source_camera_video)) },
-        )
-        ListItem(
-            modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.FromGallery) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Image())),
-            content = { Text(stringResource(R.string.screen_room_attachment_source_gallery)) },
-        )
-        ListItem(
-            modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.FromFiles) },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Attachment())),
-            content = { Text(stringResource(R.string.screen_room_attachment_source_files)) },
-        )
-        if (state.canShareLocation) {
-            ListItem(
-                modifier = Modifier.clickable {
-                    state.eventSink(MessageComposerEvent.PickAttachmentSource.Location)
-                    onSendLocationClick()
-                },
-                leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.LocationPin())),
-                content = { Text(stringResource(R.string.screen_room_attachment_source_location)) },
-            )
-        }
-        ListItem(
-            modifier = Modifier.clickable {
-                state.eventSink(MessageComposerEvent.PickAttachmentSource.Poll)
-                onCreatePollClick()
-            },
-            leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Polls())),
-            content = { Text(stringResource(R.string.screen_room_attachment_source_poll)) },
-        )
-        if (enableTextFormatting) {
-            ListItem(
-                modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.ToggleTextFormatting(enabled = true)) },
-                leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.TextFormatting())),
-                content = { Text(stringResource(R.string.screen_room_attachment_text_formatting)) },
-            )
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = ElementTheme.colors.bgCanvasDefaultLevel1,
+            border = BorderStroke(1.dp, ElementTheme.colors.borderAccentSubtle.copy(alpha = 0.5f)),
+        ) {
+            Column {
+                ListItem(
+                    modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.PhotoFromCamera) },
+                    leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.TakePhoto())),
+                    content = { Text(stringResource(R.string.screen_room_attachment_source_camera_photo)) },
+                )
+                ListItem(
+                    modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.VideoFromCamera) },
+                    leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.VideoCall())),
+                    content = { Text(stringResource(R.string.screen_room_attachment_source_camera_video)) },
+                )
+                ListItem(
+                    modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.FromGallery) },
+                    leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Image())),
+                    content = { Text(stringResource(R.string.screen_room_attachment_source_gallery)) },
+                )
+                ListItem(
+                    modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.PickAttachmentSource.FromFiles) },
+                    leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Attachment())),
+                    content = { Text(stringResource(R.string.screen_room_attachment_source_files)) },
+                )
+                if (state.canShareLocation) {
+                    ListItem(
+                        modifier = Modifier.clickable {
+                            state.eventSink(MessageComposerEvent.PickAttachmentSource.Location)
+                            onSendLocationClick()
+                        },
+                        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.LocationPin())),
+                        content = { Text(stringResource(R.string.screen_room_attachment_source_location)) },
+                    )
+                }
+                ListItem(
+                    modifier = Modifier.clickable {
+                        state.eventSink(MessageComposerEvent.PickAttachmentSource.Poll)
+                        onCreatePollClick()
+                    },
+                    leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.Polls())),
+                    content = { Text(stringResource(R.string.screen_room_attachment_source_poll)) },
+                )
+                if (enableTextFormatting) {
+                    ListItem(
+                        modifier = Modifier.clickable { state.eventSink(MessageComposerEvent.ToggleTextFormatting(enabled = true)) },
+                        leadingContent = ListItemContent.Icon(IconSource.Vector(CompoundIcons.TextFormatting())),
+                        content = { Text(stringResource(R.string.screen_room_attachment_text_formatting)) },
+                    )
+                }
+            }
         }
     }
 }

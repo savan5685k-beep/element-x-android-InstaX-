@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.plus
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -145,7 +146,6 @@ fun HomeView(
                     .background(ElementTheme.colors.bgCanvasDefault),
             )
         } else {
-            // This overlaid view will only be visible when state.displaySearchResults is true
             RoomListSearchView(
                 state = state.searchState,
                 eventSink = state.eventSink,
@@ -199,6 +199,7 @@ private fun HomeScaffold(
 
     Scaffold(
         modifier = modifier,
+        containerColor = ElementTheme.colors.bgCanvasDefault,
         topBar = {
             HomeTopBar(
                 selectedNavigationItem = state.currentHomeNavigationBarItem,
@@ -219,7 +220,6 @@ private fun HomeScaffold(
                 onMenuActionClick = onMenuActionClick,
                 onOpenSettings = onOpenSettings,
                 onAccountSwitch = { sessionId ->
-                    // The user has switched account by swiping their avatar, so they know the gesture.
                     state.eventSink(HomeEvent.DismissSwipeAvatarAnnouncement)
                     onSwitchToAccount(sessionId)
                 },
@@ -233,12 +233,9 @@ private fun HomeScaffold(
         floatingActionButton = {
             val coroutineScope = rememberCoroutineScope()
             HomeBottomBar(
-                // The Scaffold uses top-only insets so the scrollable content can go edge-to-edge behind the
-                // navigation bar, so the floating toolbar has to apply the bottom inset itself to avoid overlapping it.
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
                 currentHomeNavigationBarItem = state.currentHomeNavigationBarItem,
                 onItemClick = { item ->
-                    // scroll to top if selecting the same item
                     if (item == state.currentHomeNavigationBarItem) {
                         val lazyListStateTarget = when (item) {
                             HomeNavigationBarItem.Chats -> roomsLazyListState
@@ -248,7 +245,6 @@ private fun HomeScaffold(
                             if (lazyListStateTarget.firstVisibleItemIndex > 10) {
                                 lazyListStateTarget.scrollToItem(10)
                             }
-                            // Also reset the scrollBehavior height offset as it's not triggered by programmatic scrolls
                             scrollBehavior.state.heightOffset = 0f
                             lazyListStateTarget.animateScrollToItem(0)
                         }
@@ -275,15 +271,12 @@ private fun HomeScaffold(
             val outerPadding = PaddingValues(
                 start = padding.calculateStartPadding(LocalLayoutDirection.current),
                 end = padding.calculateEndPadding(LocalLayoutDirection.current),
-                // Remove these two lines once https://issuetracker.google.com/issues/436432313 has been fixed
                 bottom = padding.calculateBottomPadding(),
                 top = padding.calculateTopPadding()
             )
             val contentPadding = PaddingValues(
-                bottom = 96.dp,
+                bottom = 104.dp,
             )
-            // The nested scroll connection is set on the content and not on the Scaffold, else the top bar would
-            // consume the scroll events of its own content.
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -322,7 +315,6 @@ private fun HomeScaffold(
                                 onRoomClick(spaceId)
                             },
                             onCreateSpaceClick = onCreateSpaceClick,
-                            // TODO use actual callbacks for this
                             onExploreClick = {},
                         )
                     }
@@ -339,7 +331,13 @@ private fun HomeFloatingActionButton(
     contentDescription: Int,
     modifier: Modifier = Modifier,
 ) {
-    FloatingActionButton(onClick = onClick, modifier = modifier) {
+    FloatingActionButton(
+        onClick = onClick,
+        shape = RoundedCornerShape(18.dp),
+        containerColor = ElementTheme.colors.bgActionPrimaryRest,
+        contentColor = ElementTheme.colors.iconOnSolidPrimary,
+        modifier = modifier,
+    ) {
         Icon(
             imageVector = CompoundIcons.Plus(),
             contentDescription = stringResource(id = contentDescription),

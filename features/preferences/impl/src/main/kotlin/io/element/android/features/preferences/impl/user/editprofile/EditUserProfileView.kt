@@ -9,6 +9,7 @@
 package io.element.android.features.preferences.impl.user.editprofile
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,9 +55,6 @@ import io.element.android.libraries.matrix.ui.components.AvatarPickerView
 import io.element.android.libraries.permissions.api.PermissionsView
 import io.element.android.libraries.ui.strings.CommonStrings
 
-/**
- * https://www.figma.com/design/pDlJZGBsri47FNTXMnEdXB/Compound-Android-Templates?node-id=3182-36115&t=U1vS3px9HzlzWYd7-4
- */
 @Composable
 fun EditUserProfileView(
     state: EditUserProfileState,
@@ -105,37 +105,62 @@ fun EditUserProfileView(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
-            val avatarPickerState = remember(state.userAvatarUrl) {
-                val size = AvatarSize.EditProfileDetails
-                val type = AvatarType.User
-                AvatarPickerState.Selected(
-                    avatarData = AvatarData(id = state.userId.value, name = state.displayName, size = size, url = state.userAvatarUrl),
-                    type = type
+            Spacer(modifier = Modifier.height(20.dp))
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = ElementTheme.colors.bgAccentSubtle.copy(alpha = 0.45f),
+                border = BorderStroke(1.dp, ElementTheme.colors.borderAccentSubtle.copy(alpha = 0.6f)),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp, horizontal = 16.dp),
+                ) {
+                    val avatarPickerState = remember(state.userAvatarUrl) {
+                        val size = AvatarSize.EditProfileDetails
+                        val type = AvatarType.User
+                        AvatarPickerState.Selected(
+                            avatarData = AvatarData(id = state.userId.value, name = state.displayName, size = size, url = state.userAvatarUrl),
+                            type = type
+                        )
+                    }
+                    AvatarPickerView(
+                        state = avatarPickerState,
+                        onClick = ::onAvatarClick,
+                        enabled = state.canChangeAvatarUrl,
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = state.userId.value,
+                        style = ElementTheme.typography.fontBodyMdMedium,
+                        color = ElementTheme.colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = ElementTheme.colors.bgCanvasDefaultLevel1,
+                border = BorderStroke(1.dp, ElementTheme.colors.borderAccentSubtle.copy(alpha = 0.5f)),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                TextField(
+                    label = stringResource(R.string.screen_edit_profile_display_name),
+                    value = state.displayName,
+                    placeholder = stringResource(CommonStrings.common_room_name_placeholder),
+                    singleLine = true,
+                    enabled = state.canChangeDisplayName,
+                    onValueChange = { state.eventSink(EditUserProfileEvent.UpdateDisplayName(it)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 )
             }
-            AvatarPickerView(
-                state = avatarPickerState,
-                onClick = ::onAvatarClick,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                enabled = state.canChangeAvatarUrl,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = state.userId.value,
-                style = ElementTheme.typography.fontBodyLgRegular,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            TextField(
-                label = stringResource(R.string.screen_edit_profile_display_name),
-                value = state.displayName,
-                placeholder = stringResource(CommonStrings.common_room_name_placeholder),
-                singleLine = true,
-                enabled = state.canChangeDisplayName,
-                onValueChange = { state.eventSink(EditUserProfileEvent.UpdateDisplayName(it)) },
-            )
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         AvatarActionBottomSheet(
