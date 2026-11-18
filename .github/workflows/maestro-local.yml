@@ -112,13 +112,17 @@ jobs:
         with:
           python-version: 3.15
       - name: End all the remaining sessions of the Maestro account
-        if: always() && env.MAS_PASSWORD != ''
+        if: always()
         continue-on-error: true
         env:
           MAS_PASSWORD: ${{ secrets.MATRIX_MAESTRO_ACCOUNT_PASSWORD }}
         run: |
-          pip install requests
-          python3 ./tools/mas/delete_all_sessions.py --homeserver matrix.org --username maestroelement
+          if [ -z "$MAS_PASSWORD" ]; then
+            echo "No Maestro account password secret configured; skipping session cleanup."
+          else
+            pip install requests
+            python3 ./tools/mas/delete_all_sessions.py --homeserver matrix.org --username maestroelement
+          fi
       - name: Upload test results
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
